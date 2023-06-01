@@ -1,7 +1,12 @@
+require('dotenv/config');
 var express = require('express');
 var app = express();
-app.use(express.json());
-var { fromFile } = require('./services/SpeechRecognition.js'); // Update the path accordingly
+var SpeechRecognition = require('./services/SpeechRecognition.js');
+var ResponseAI = require('./services/ResponseCreate.js')
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+
 
 app.get('/audio', async function (req, res) {
   try {
@@ -13,36 +18,17 @@ app.get('/audio', async function (req, res) {
   }
 });
 
-async function obterRespostaDaAPIOpenAI(pergunta) {
 
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPEN_IA_API_KEY,
-});
 
-const openai = new OpenAIApi(configuration);
-const response = await openai.createCompletion({
-  model: "text-davinci-003",
-  prompt: "Say this is a test",
-  max_tokens: 7,
-  temperature: 0,
-});
+app.post('/resposta', async function(req, res){
+  const pergunta = req.body.pergunta;
+try{
+    var texto = await ResponseAI.obterRespostaDaAPIOpenAI(pergunta);
+    res.send(texto.content)
+  }catch(error){
+    console.error(error);
+    res.status(500).send('Erro no processamento');}
+    
+})
 
-console.log(response.data.choices[0].text)
-
-}
-
-app.post('/pergunta', async (req, res) => {
-  try {
-    const pergunta = req.body.pergunta;
-    const resposta = await obterRespostaDaAPIOpenAI(pergunta);
-    res.json({ resposta });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao processar a pergunta' });
-  }
-});
-
-app.listen(3030, function () {
-  console.log('Server is running on port 3030');
-});
-
+app.listen(3030);
