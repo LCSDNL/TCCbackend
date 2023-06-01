@@ -9,7 +9,7 @@ speechConfig.speechRecognitionLanguage = "pt-BR";
 class SpeechRecognition {
   static fromFile() {
     return new Promise((resolve, reject) => {
-      let audioConfig = sdk.AudioConfig.fromWavFileInput(fs.readFileSync("C:/Users/Lucas/Documents/projetoTCC/backend/TCCback/services/testebr.wav"));
+      let audioConfig = sdk.AudioConfig.fromWavFileInput(fs.readFileSync("../testebr.wav"));
       let speechRecognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
 
       speechRecognizer.recognizeOnceAsync(result => {

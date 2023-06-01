@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 app.get('/audio', async function (req, res) {
   try {
-    var texto = await SpeechRecognition.fromFile();
+    var texto = await fromFile(); // Call the correct function from your 'SpeechRecognition' module
     res.send(texto);
   } catch (error) {
     console.error(error);
