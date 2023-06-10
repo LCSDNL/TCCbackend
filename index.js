@@ -5,11 +5,14 @@ var SpeechRecognition = require('./services/SpeechRecognition.js');
 var ResponseAI = require('./services/ResponseCreate.js')
 const bodyParser = require('body-parser');
 var cors = require('cors')
+const sdk = require("microsoft-cognitiveservices-speech-sdk");
+const { PassThrough } = require('stream');
+
 
 app.use(bodyParser.json());
 app.use(cors())
 
-
+/*
 app.get('/audio', async function (req, res) {
   try {
     var texto = await SpeechRecognition.fromFile(); // Call the correct function from your 'SpeechRecognition' module
@@ -19,7 +22,7 @@ app.get('/audio', async function (req, res) {
     res.status(500).send('Erro no processamento');
   }
 });
-
+*/
 
 
 app.post('/resposta', async function(req, res){
@@ -32,5 +35,34 @@ try{
     res.status(500).send('Erro no processamento');}
     
 })
+
+
+app.post('/restotext', async function(req, res) {
+  const speechConfig = sdk.SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
+  const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
+
+  speechSynthesizer.speakTextAsync(
+    req.body.texto,
+    result => {
+      const { audioData } = result;
+
+      speechSynthesizer.close();
+
+      // Converte o arrayBuffer em um stream
+      const bufferStream = new PassThrough();
+      bufferStream.end(Buffer.from(audioData));
+
+      // Envia a resposta com o áudio
+      res.set('Content-Type', 'audio/wav');
+      bufferStream.pipe(res);
+    },
+    error => {
+      console.log(error);
+      speechSynthesizer.close();
+      res.status(500).send('Erro ao sintetizar o áudio');
+    }
+  );
+});
+
 
 app.listen(3030);
