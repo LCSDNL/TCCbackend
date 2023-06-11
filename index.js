@@ -42,7 +42,7 @@ app.post('/restotext', async function(req, res) {
   const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
 
   const ssml = `<speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="en-US">
-  <voice name="pt-BR-ElzaNeural">
+  <voice name="${req.body.vozAutor}">
     ${req.body.texto}
   </voice>
 </speak>`
