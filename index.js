@@ -41,8 +41,14 @@ app.post('/restotext', async function(req, res) {
   const speechConfig = sdk.SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
   const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
 
-  speechSynthesizer.speakTextAsync(
-    req.body.texto,
+  const ssml = `<speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+  <voice name="pt-BR-ElzaNeural">
+    ${req.body.texto}
+  </voice>
+</speak>`
+
+  speechSynthesizer.speakSsmlAsync(
+    ssml,
     result => {
       const { audioData } = result;
 

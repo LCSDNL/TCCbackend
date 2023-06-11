@@ -12,8 +12,8 @@ class ResponseAI{
     
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: [{role: "user", content: pergunta}],
-      max_tokens: 50,
+      messages: [{role: "user", content: `em no maximo 300 caracteres. ${pergunta}`}],
+      max_tokens: 300,
     });
     console.log(completion.data.choices[0].message);
     return completion.data.choices[0].message;
