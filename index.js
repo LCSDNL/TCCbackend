@@ -43,7 +43,9 @@ app.post('/restotext', async function(req, res) {
 
   const ssml = `<speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="en-US">
   <voice name="${req.body.vozAutor}">
-    ${req.body.texto}
+    <prosody rate="${req.body.vozVelocidade}%" pitch="${req.body.vozTom}%">
+      ${req.body.texto}
+    </prosody>
   </voice>
 </speak>`
 
