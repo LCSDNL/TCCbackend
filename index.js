@@ -1,16 +1,15 @@
-require('dotenv/config');
-var express = require('express');
+require("dotenv/config");
+var express = require("express");
 var app = express();
-var SpeechRecognition = require('./services/SpeechRecognition.js');
-var ResponseAI = require('./services/ResponseCreate.js')
-const bodyParser = require('body-parser');
-var cors = require('cors')
+//var SpeechRecognition = require('./services/SpeechRecognition.js');
+var ResponseAI = require("./services/ResponseCreate.js");
+const bodyParser = require("body-parser");
+var cors = require("cors");
 const sdk = require("microsoft-cognitiveservices-speech-sdk");
-const { PassThrough } = require('stream');
-
+const { PassThrough } = require("stream");
 
 app.use(bodyParser.json());
-app.use(cors())
+app.use(cors());
 
 /*
 app.get('/audio', async function (req, res) {
@@ -24,21 +23,22 @@ app.get('/audio', async function (req, res) {
 });
 */
 
-
-app.post('/resposta', async function(req, res){
+app.post("/resposta", async function (req, res) {
   const pergunta = req.body.pergunta;
-try{
+  try {
     var texto = await ResponseAI.obterRespostaDaAPIOpenAI(pergunta);
-    res.send(texto.content)
-  }catch(error){
+    res.send(texto.content);
+  } catch (error) {
     console.error(error);
-    res.status(500).send('Erro no processamento');}
-    
-})
+    res.status(500).send("Erro no processamento");
+  }
+});
 
-
-app.post('/restotext', async function(req, res) {
-  const speechConfig = sdk.SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
+app.post("/restotext", async function (req, res) {
+  const speechConfig = sdk.SpeechConfig.fromSubscription(
+    process.env.SPEECH_KEY,
+    process.env.SPEECH_REGION
+  );
   const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
 
   const ssml = `<speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="en-US">
@@ -47,11 +47,11 @@ app.post('/restotext', async function(req, res) {
       ${req.body.texto}
     </prosody>
   </voice>
-</speak>`
+</speak>`;
 
   speechSynthesizer.speakSsmlAsync(
     ssml,
-    result => {
+    (result) => {
       const { audioData } = result;
 
       speechSynthesizer.close();
@@ -61,16 +61,15 @@ app.post('/restotext', async function(req, res) {
       bufferStream.end(Buffer.from(audioData));
 
       // Envia a resposta com o áudio
-      res.set('Content-Type', 'audio/wav');
+      res.set("Content-Type", "audio/wav");
       bufferStream.pipe(res);
     },
-    error => {
+    (error) => {
       console.log(error);
       speechSynthesizer.close();
-      res.status(500).send('Erro ao sintetizar o áudio');
+      res.status(500).send("Erro ao sintetizar o áudio");
     }
   );
 });
-
 
 app.listen(3030);

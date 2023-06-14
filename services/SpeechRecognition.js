@@ -1,18 +1,26 @@
-require('dotenv').config();
+require("dotenv").config();
 const fs = require("fs");
 const sdk = require("microsoft-cognitiveservices-speech-sdk");
 
 // This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
-const speechConfig = sdk.SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
+const speechConfig = sdk.SpeechConfig.fromSubscription(
+  process.env.SPEECH_KEY,
+  process.env.SPEECH_REGION
+);
 speechConfig.speechRecognitionLanguage = "pt-BR";
 
 class SpeechRecognition {
   static fromFile() {
     return new Promise((resolve, reject) => {
-      let audioConfig = sdk.AudioConfig.fromWavFileInput(fs.readFileSync("../testebr.wav"));
-      let speechRecognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+      let audioConfig = sdk.AudioConfig.fromWavFileInput(
+        fs.readFileSync("../testebr.wav")
+      );
+      let speechRecognizer = new sdk.SpeechRecognizer(
+        speechConfig,
+        audioConfig
+      );
 
-      speechRecognizer.recognizeOnceAsync(result => {
+      speechRecognizer.recognizeOnceAsync((result) => {
         switch (result.reason) {
           case sdk.ResultReason.RecognizedSpeech:
             console.log(`RECOGNIZED: Text=${result.text}`);
@@ -28,8 +36,12 @@ class SpeechRecognition {
 
             if (cancellation.reason === sdk.CancellationReason.Error) {
               console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
-              console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
-              console.log("CANCELED: Did you set the speech resource key and region values?");
+              console.log(
+                `CANCELED: ErrorDetails=${cancellation.errorDetails}`
+              );
+              console.log(
+                "CANCELED: Did you set the speech resource key and region values?"
+              );
             }
             reject(new Error("Recognition was canceled."));
             break;
